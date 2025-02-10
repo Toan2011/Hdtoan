@@ -1,0 +1,86 @@
+local HgDytoan = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local AutoFarmBtn = Instance.new("TextButton")
+local AutoQuestBtn = Instance.new("TextButton")
+local AutoBossBtn = Instance.new("TextButton")
+local AutoChestBtn = Instance.new("TextButton")
+local ESPBtn = Instance.new("TextButton")
+local TeleportBtn = Instance.new("TextButton")
+
+HgDytoan.Name = "HgDytoan"
+HgDytoan.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = HgDytoan
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.Size = UDim2.new(0, 250, 0, 350)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -175)
+
+UICorner.Parent = MainFrame
+
+local function createButton(name, parent, pos, callback)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Parent = parent
+    btn.Size = UDim2.new(0, 230, 0, 40)
+    btn.Position = UDim2.new(0.5, -115, 0, pos)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Text = name
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
+
+AutoFarmBtn = createButton("Auto Farm", MainFrame, 20, function()
+    _G.AutoFarm = not _G.AutoFarm
+    while _G.AutoFarm do
+        wait(1)
+        for _, enemy in pairs(game.Workspace.Enemies:GetChildren()) do
+            if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame
+                game.ReplicatedStorage.Remotes.CommF_:InvokeServer("Attack")
+            end
+        end
+    end
+end)
+
+AutoQuestBtn = createButton("Auto Quest", MainFrame, 70, function()
+    game.ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", "BanditQuest1", 1)
+end)
+
+AutoBossBtn = createButton("Auto Boss", MainFrame, 120, function()
+    _G.AutoBoss = not _G.AutoBoss
+    while _G.AutoBoss do
+        wait(1)
+        for _, boss in pairs(game.Workspace.Enemies:GetChildren()) do
+            if boss.Name:match("Boss") and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = boss.HumanoidRootPart.CFrame
+                game.ReplicatedStorage.Remotes.CommF_:InvokeServer("Attack")
+            end
+        end
+    end
+end)
+
+AutoChestBtn = createButton("Auto Chest", MainFrame, 170, function()
+    for _, chest in pairs(game.Workspace:GetChildren()) do
+        if chest.Name:match("Chest") then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = chest.CFrame
+        end
+    end
+end)
+
+ESPBtn = createButton("ESP (Wallhack)", MainFrame, 220, function()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            local highlight = Instance.new("Highlight")
+            highlight.Parent = player.Character
+            highlight.FillColor = Color3.fromRGB(255, 0, 0)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        end
+    end
+end)
+
+TeleportBtn = createButton("Teleport To Safe Zone", MainFrame, 270, function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(100, 50, 100)
+end)
